@@ -1,38 +1,31 @@
-# 工作流程的名稱，會在 GitHub Actions 介面中顯示
-name: Deploy to Firebase Hosting
+# 工作流程的名稱
+name: Deploy to Firebase Hosting via GitHub Actions
 
-# 定義工作流程觸發的事件
+# 定義觸發事件：當有程式碼推送到 main 分支時
 on:
   push:
     # 當有程式碼推送到 main 分支時觸發這個工作流程
     branches:
       - main # 假設你的主要開發分支是 main
 
-  # 可選：你也可以在這裡添加其他觸發事件，例如：
-  # pull_request:
-  #   branches:
-  #     - main # 在有人向 main 分支發起 Pull Request 時運行，用於測試建置是否成功
-
-# 定義工作流程中要執行的一或多個任務 (jobs)
 jobs:
-  # 這是一個名為 build_and_deploy 的任務
   build_and_deploy:
-    # 指定任務在哪種操作系統環境上運行 (這裡使用最新的 Ubuntu 虛擬機)
+    # 運行在最新的 Ubuntu 虛擬機上
     runs-on: ubuntu-latest
 
-    # 定義任務中要執行的一系列步驟 (steps)
+    # 任務步驟
     steps:
       # 步驟 1: 拉取 GitHub 儲存庫的程式碼到虛擬機中
       - name: Checkout code
-        uses: actions/checkout@v4 # 使用 actions/checkout Action
+        uses: actions/checkout@v4
 
-      # 步驟 2: 設置 Java 環境 (Flutter 建置需要 Java)
+      # 步驟 2: 設置 Java 環境 (Flutter 建置需要)
       # 根據你使用的 Flutter 版本，可能需要特定的 Java 版本
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu' # 或者 'temurin' 等
-          java-version: '17'   # 通常較新的 Flutter 版本需要 Java 11 或更高
+          distribution: 'zulu'
+          java-version: '17' # 通常較新的 Flutter 版本需要 Java 11 或更高
 
       # 步驟 3: 設置 Flutter SDK 環境
       # subosito/flutter-action 是一個非常方便的 Action，用於設置 Flutter
@@ -42,35 +35,36 @@ jobs:
           flutter-version: '3.x' # 指定要使用的 Flutter 版本 (例如 '3.x' 表示最新的 3.x 穩定版)
           channel: 'stable'      # 使用 stable 渠道
 
-      # 步驟 4: 設置 Node.js 環境 (Firebase CLI 需要 Node.js)
+      # 步驟 4: 設置 Node.js 環境 (Firebase CLI Action 內部需要)
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # 指定 Node.js 版本 (推薦使用 LTS 版本)
+          node-version: '20' # 使用推薦的 LTS 版本
 
-      # 步驟 5: 安裝 Firebase CLI
-      # 使用 npm 在虛擬機中全局安裝 firebase-tools
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-
-      # 步驟 6: 獲取 Flutter 專案依賴
-      # 在專案根目錄下運行 flutter pub get
+      # 步驟 5: 獲取 Flutter 專案依賴
       - name: Get Flutter dependencies
         run: flutter pub get
-        working-directory: ./salary_calculator
+        working-directory: ./salary_calculator # <--- 已替換
 
-      # 步驟 7: 建置 Flutter Web 應用程式
-      # 運行 flutter build web --release 命令來生成用於部署的文件
+      # 步驟 6: 建置 Flutter Web 應用程式
       - name: Build Flutter Web
-        run: flutter build web --release # --release 標誌用於生成優化後的發布版本
-        working-directory: ./salary_calculator
+        run: flutter build web --release # 生成發布版本文件
+        working-directory: ./salary_calculator # <--- 已替換
 
-      # 步驟 8: 部署到 Firebase Hosting
-      # 運行 firebase deploy 命令，使用之前儲存在 GitHub Secret 的 Token 進行身份驗證
-      # --only hosting 指定只部署 Hosting 服務
-      # ${{ secrets.FIREBASE_DEPLOY_TOKEN }} 會從 GitHub Secret 中讀取 Token 的值
+      # 步驟 7: 部署到 Firebase Hosting 使用官方 Action
+      # 這個 Action 會在內部處理安裝和執行 Firebase CLI
       - name: Deploy to Firebase Hosting
-        run: firebase deploy --only hosting --token ${{ secrets.FIREBASE_DEPLOY_TOKEN }}
-        # env:
-          # 可選：如果你在 .firebaserc 中使用了專案別名，並且想在這裡明確指定要部署的專案
-          # FIREBASE_CLI_PROJECT: '你的專案別名' # 例如如果你在 .firebaserc 設定了 'default': 'your-project-id'
+        uses: FirebaseExtended/action-hosting-deploy@v0 # 使用官方部署 Action 的 v0 版本
+        with:
+          # repoToken 是 GitHub Actions 內建的 Token
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          # firebaseToken 參數用於傳遞我們的 Firebase 部署 Token
+          firebaseToken: ${{ secrets.FIREBASE_DEPLOY_TOKEN }} # 從 GitHub Secret 中讀取 Token
+          # 可選：明確指定要部署的 Firebase 專案 ID (Action 通常可以從 .firebaserc 推斷)
+          # projectId: '你的專案ID'
+          # 可選：指定部署到哪個渠道，'live' 是默認的主要 URL
+          channelId: live
+
+        # <--- 在這裡添加 working-directory 屬性！
+        # 這會讓 FirebaseExtended/action-hosting-deploy 這個 Action 在指定目錄中執行
+        working-directory: ./salary_calculator # <--- 已替換
