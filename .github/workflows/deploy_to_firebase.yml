@@ -57,11 +57,13 @@ jobs:
       # 在專案根目錄下運行 flutter pub get
       - name: Get Flutter dependencies
         run: flutter pub get
+        working-directory: ./salary_calculator
 
       # 步驟 7: 建置 Flutter Web 應用程式
       # 運行 flutter build web --release 命令來生成用於部署的文件
       - name: Build Flutter Web
         run: flutter build web --release # --release 標誌用於生成優化後的發布版本
+        working-directory: ./salary_calculator
 
       # 步驟 8: 部署到 Firebase Hosting
       # 運行 firebase deploy 命令，使用之前儲存在 GitHub Secret 的 Token 進行身份驗證
