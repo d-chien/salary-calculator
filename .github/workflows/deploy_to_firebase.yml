@@ -58,9 +58,14 @@ jobs:
         with:
           # repoToken 是 GitHub Actions 內建的 Token
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          # firebaseToken 參數用於傳遞我們的 Firebase 部署 Token
-          firebaseToken: ${{ secrets.FIREBASE_DEPLOY_TOKEN }} # 從 GitHub Secret 中讀取 Token
-          # 可選：明確指定要部署的 Firebase 專案 ID (Action 通常可以從 .firebaserc 推斷)
+         # <--- 使用服務帳戶密鑰進行身份驗證 ---
+          # firebaseServiceAccount 參數用於傳遞服務帳戶密鑰的 JSON 內容
+          # 指向你在 GitHub Secret 中創建的那個 Secret 的名稱
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }} # <-- 將這裡替換成你在 GitHub Secrets 中設定的名稱
+
+          # 明確指定要部署的 Firebase 專案 ID
+          projectId: 'salary-calculator-0001' # <--- 將這裡替換成你在 Google Cloud Console/Firebase Console 中看到的實際專案 ID
+
           # <--- 在這裡新增 entryPoint 參數！
           entryPoint: ./salary_calculator 
           # projectId: '你的專案ID'
