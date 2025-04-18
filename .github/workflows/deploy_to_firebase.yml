@@ -1,0 +1,74 @@
+# 工作流程的名稱，會在 GitHub Actions 介面中顯示
+name: Deploy to Firebase Hosting
+
+# 定義工作流程觸發的事件
+on:
+  push:
+    # 當有程式碼推送到 main 分支時觸發這個工作流程
+    branches:
+      - main # 假設你的主要開發分支是 main
+
+  # 可選：你也可以在這裡添加其他觸發事件，例如：
+  # pull_request:
+  #   branches:
+  #     - main # 在有人向 main 分支發起 Pull Request 時運行，用於測試建置是否成功
+
+# 定義工作流程中要執行的一或多個任務 (jobs)
+jobs:
+  # 這是一個名為 build_and_deploy 的任務
+  build_and_deploy:
+    # 指定任務在哪種操作系統環境上運行 (這裡使用最新的 Ubuntu 虛擬機)
+    runs-on: ubuntu-latest
+
+    # 定義任務中要執行的一系列步驟 (steps)
+    steps:
+      # 步驟 1: 拉取 GitHub 儲存庫的程式碼到虛擬機中
+      - name: Checkout code
+        uses: actions/checkout@v4 # 使用 actions/checkout Action
+
+      # 步驟 2: 設置 Java 環境 (Flutter 建置需要 Java)
+      # 根據你使用的 Flutter 版本，可能需要特定的 Java 版本
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu' # 或者 'temurin' 等
+          java-version: '17'   # 通常較新的 Flutter 版本需要 Java 11 或更高
+
+      # 步驟 3: 設置 Flutter SDK 環境
+      # subosito/flutter-action 是一個非常方便的 Action，用於設置 Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x' # 指定要使用的 Flutter 版本 (例如 '3.x' 表示最新的 3.x 穩定版)
+          channel: 'stable'      # 使用 stable 渠道
+
+      # 步驟 4: 設置 Node.js 環境 (Firebase CLI 需要 Node.js)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # 指定 Node.js 版本 (推薦使用 LTS 版本)
+
+      # 步驟 5: 安裝 Firebase CLI
+      # 使用 npm 在虛擬機中全局安裝 firebase-tools
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      # 步驟 6: 獲取 Flutter 專案依賴
+      # 在專案根目錄下運行 flutter pub get
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      # 步驟 7: 建置 Flutter Web 應用程式
+      # 運行 flutter build web --release 命令來生成用於部署的文件
+      - name: Build Flutter Web
+        run: flutter build web --release # --release 標誌用於生成優化後的發布版本
+
+      # 步驟 8: 部署到 Firebase Hosting
+      # 運行 firebase deploy 命令，使用之前儲存在 GitHub Secret 的 Token 進行身份驗證
+      # --only hosting 指定只部署 Hosting 服務
+      # ${{ secrets.FIREBASE_DEPLOY_TOKEN }} 會從 GitHub Secret 中讀取 Token 的值
+      - name: Deploy to Firebase Hosting
+        run: firebase deploy --only hosting --token ${{ secrets.FIREBASE_DEPLOY_TOKEN }}
+        # env:
+          # 可選：如果你在 .firebaserc 中使用了專案別名，並且想在這裡明確指定要部署的專案
+          # FIREBASE_CLI_PROJECT: '你的專案別名' # 例如如果你在 .firebaserc 設定了 'default': 'your-project-id'
