@@ -120,83 +120,99 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
   }
 
 
-  // 開始工作計算
+// 開始工作計算
   void _startWork() {
     final nickname = _nicknameController.text.trim();
     final monthlySalary = double.tryParse(_monthlySalaryController.text);
 
-    // 檢查輸入和時間選擇是否有效
-    if (nickname.isEmpty || monthlySalary == null || monthlySalary <= 0 || _selectedStartTime == null || _selectedEndTime == null) {
+    // --- 輸入驗證 ---
+
+    // 驗證暱稱是否為空
+    if (nickname.isEmpty) {
       setState(() {
-        _statusMessage = '請填寫暱稱、有效的月薪並選擇開始與結束時間';
+        _statusMessage = '請輸入你的暱稱'; // 具體提示暱稱問題
       });
-      return; // 輸入無效，停止後續操作
+      return; // 驗證失敗，停止後續操作
     }
 
-    // 結合今天的日期和選定的時間
+    // 驗證月薪是否為有效的正數
+    // double.tryParse 如果解析失敗會返回 null
+    if (monthlySalary == null || monthlySalary <= 0) {
+      setState(() {
+        // 具體提示月薪問題
+        _statusMessage = '請輸入一個有效的正數月薪';
+      });
+      return; // 驗證失敗，停止後續操作
+    }
+
+    // 驗證時間是否已選擇
+    if (_selectedStartTime == null || _selectedEndTime == null) {
+       setState(() {
+         _statusMessage = '請選擇工作開始時間和結束時間'; // 具體提示時間選擇問題
+       });
+       return; // 驗證失敗，停止後續操作
+    }
+
+    // 驗證時間區間是否有效 (結束時間在開始時間之後，且時長合理)
+    // 我們需要先組合 DateTime 物件來計算時長
     final now = DateTime.now();
-    _workStartTimeToday = DateTime(now.year, now.month, now.day, _selectedStartTime!.hour, _selectedStartTime!.minute);
-    _workEndTimeToday = DateTime(now.year, now.month, now.day, _selectedEndTime!.hour, _selectedEndTime!.minute);
+    final workStartTimeToday = DateTime(now.year, now.month, now.day, _selectedStartTime!.hour, _selectedStartTime!.minute);
+    var workEndTimeToday = DateTime(now.year, now.month, now.day, _selectedEndTime!.hour, _selectedEndTime!.minute);
 
-     // 如果結束時間在開始時間之前（假設是第二天），簡單處理為添加到第二天
-     // 注意：這個簡單處理沒有考慮跨越多天，僅限於一天內或跨午夜一次
-    if (_workEndTimeToday!.isBefore(_workStartTimeToday!)) {
-        _workEndTimeToday = _workEndTimeToday!.add(const Duration(days: 1));
+    // 處理跨午夜的情況：如果結束時間數字上早於開始時間，假設它是第二天的時間
+    // 注意：這個簡單處理沒有考慮跨越多天，僅限於一天內或跨午夜一次
+    if (workEndTimeToday.isBefore(workStartTimeToday)) {
+        workEndTimeToday = workEndTimeToday.add(const Duration(days: 1));
     }
 
-    // 計算總工作時長
-    _totalWorkDuration = _workEndTimeToday!.difference(_workStartTimeToday!);
+    final totalWorkDuration = workEndTimeToday.difference(workStartTimeToday);
 
-    // 檢查總工作時長是否有效
-     if (_totalWorkDuration!.inSeconds <= 0) {
+    // 檢查計算出的總工作時長是否大於 0，且不超過 24 小時（符合簡單跨午夜的假設）
+    if (totalWorkDuration.inSeconds <= 0 || totalWorkDuration.inHours > 24) {
          setState(() {
-           _statusMessage = '結束時間必須在開始時間之後';
+           _statusMessage = '請選擇有效的開始和結束時間 (結束時間需在開始時間之後，且總時長不超過24小時)';
          });
-         // 如果開始時間是今天結束時間是明天同一時間，時長是24小時，這是合理的
-         // 如果用戶選 9:00 到 9:00，時長是0，不合理
-         // 如果用戶選 9:00 到 8:00 (同一天)，_workEndTimeToday 在 _workStartTimeToday 之前，上面加一天會變成 9:00 到隔天 8:00
-         // 如果用戶選 23:00 到 1:00 (同一天)，_workEndTimeToday 在 _workStartTimeToday 之前，上面加一天會變成 23:00 到隔天 1:00 (時長 2 小時)
-         // 簡單化處理：如果加一天後的總時長 <= 0，或者超過 24 小時，視為無效輸入
-         if (_totalWorkDuration!.inHours > 24 || _totalWorkDuration!.inSeconds <= 0) {
-              setState(() {
-                _statusMessage = '請選擇有效的開始和結束時間';
-              });
-              return;
-         }
-     }
+         return; // 驗證失敗，停止後續操作
+    }
 
 
-    // 計算費率
+    // --- 輸入驗證結束 ---
+    // 如果所有驗證都通過，才執行後續的計算設置和狀態更新
+
+    // 將經過驗證的時間值賦給 State 變數，用於後續計算
+    _workStartTimeToday = workStartTimeToday;
+    _workEndTimeToday = workEndTimeToday;
+    _totalWorkDuration = totalWorkDuration;
+
+
+    // 計算日薪和每秒費率 (使用經過驗證的月薪值)
     _calculateRates(monthlySalary);
 
+     // 再次檢查費率是否計算成功（理論上前面積分已通過，這裡通常不會失敗）
      if (_dailyRate <= 0 || _secondRate <= 0) {
          setState(() {
-           _statusMessage = '計算費率時出錯，請檢查月薪和時長';
+           _statusMessage = '計算費率時出錯，請檢查輸入'; // 通用錯誤訊息
          });
          return;
      }
 
 
-    // 初始化狀態
+    // 初始化狀態以進入計算顯示界面
     setState(() {
-      // 注意：_isWorking 的概念在這裡改為「當前時間是否在工作時段內」
-      // 而不是「計算是否正在進行」
-      // 計算總是會進行，直到工作時段結束
-      _isWorking = false; // 先假設不在工作時段
-      _isWorkdayFinished = false; // 先假設工作未結束
-      _currentEarnings = 0.0; // 金額初始化
-      _workProgress = 0.0; // 進度條初始化
-       // 不再需要 _sessionStartTime
-       _statusMessage = '準備計算...'; // 更新狀態訊息
+      // _isWorking 和 _isWorkdayFinished 的初始狀態將在第一次 _updateEarnings 調用中根據當前時間設定
+      _isWorking = false;
+      _isWorkdayFinished = false;
+      _currentEarnings = 0.0; // 金額歸零
+      _workProgress = 0.0; // 進度歸零
+       _statusMessage = '準備計算...'; // 提示狀態
     });
 
-    // 啟動定時器，每 100 毫秒更新一次
+    // 啟動定時器，定時更新金額和進度
     _timer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      // 在定時器觸發時調用 _updateEarnings 函數
       _updateEarnings();
     });
 
-    // 立即調用一次更新，以便在進入計算頁面時顯示正確的初始狀態
+    // 立即調用一次更新，確保頁面載入計算界面時顯示正確的初始狀態 (如「工作尚未開始」)
     _updateEarnings();
   }
 
