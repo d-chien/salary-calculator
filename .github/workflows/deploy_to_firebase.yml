@@ -61,10 +61,12 @@ jobs:
           # firebaseToken 參數用於傳遞我們的 Firebase 部署 Token
           firebaseToken: ${{ secrets.FIREBASE_DEPLOY_TOKEN }} # 從 GitHub Secret 中讀取 Token
           # 可選：明確指定要部署的 Firebase 專案 ID (Action 通常可以從 .firebaserc 推斷)
+          # <--- 在這裡新增 entryPoint 參數！
+          entryPoint: ./salary_calculator 
           # projectId: '你的專案ID'
           # 可選：指定部署到哪個渠道，'live' 是默認的主要 URL
           channelId: live
 
         # <--- 在這裡添加 working-directory 屬性！
         # 這會讓 FirebaseExtended/action-hosting-deploy 這個 Action 在指定目錄中執行
-        working-directory: ./salary_calculator # <--- 已替換
+        # working-directory: ./salary_calculator # <--- 已替換
