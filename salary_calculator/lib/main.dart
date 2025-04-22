@@ -688,7 +688,7 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
                     children: <Widget>[
                        // --- 模式切換開關 ---
                        SwitchListTile( // 列表項形式的開關
-                          title: const Text('啟用會議(老闆)模式：可計算同場會議整體消耗了多少的薪水'), // 標題
+                          title: const Text('會議(老闆)模式：可計算同場會議整體消耗了多少的薪水'), // 標題
                           value: _meetingMode, // 開關的當前值
                           onChanged: (bool value) {
                              // 當開關狀態改變時，重置所有狀態並切換模式
