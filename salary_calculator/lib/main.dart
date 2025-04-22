@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '薪水計算器',
+      title: '種下您今天的搖錢樹 Make every second counts',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -382,7 +382,7 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
         } else if (isDuringWork) {
            _statusMessage = '工作進行中...';
         } else { // isAfterWork
-           _statusMessage = '恭喜！今天的目標已達成！'; // 工作日結束訊息
+           _statusMessage = '恭喜！今天的搖錢樹已長大！\n今天共賺了${earnings.toStringAsFixed(2)}元'; // 工作日結束訊息
         }
 
         // 如果工作日已經結束，取消定時器
@@ -657,7 +657,7 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
   Widget build(BuildContext context) {
     return Scaffold( // 提供基本的應用程式結構
       appBar: AppBar( // 應用程式頂部欄
-        title: const Text('薪水計算器'), // 標題
+        title: const Text('種下您今天的搖錢樹 Make every second counts'), // 標題
         centerTitle: true, // 標題居中
       ),
       body: Padding( // 為 body 內容添加內邊距
@@ -688,7 +688,7 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
                     children: <Widget>[
                        // --- 模式切換開關 ---
                        SwitchListTile( // 列表項形式的開關
-                          title: const Text('啟用會議模式'), // 標題
+                          title: const Text('啟用會議(老闆)模式：可計算同場會議整體消耗了多少的薪水'), // 標題
                           value: _meetingMode, // 開關的當前值
                           onChanged: (bool value) {
                              // 當開關狀態改變時，重置所有狀態並切換模式
@@ -895,7 +895,7 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
                             const SizedBox(height: 24), // 間距
 
                            Text( // 已賺金額提示文本
-                             '今天已賺到:',
+                             '您的努力為您賺到了:',
                              textAlign: TextAlign.center,
                              style: TextStyle(fontSize: 20, color: Colors.blueGrey[700]),
                            ),
