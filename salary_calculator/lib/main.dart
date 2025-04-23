@@ -709,7 +709,7 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
   Widget build(BuildContext context) {
     return Scaffold( // 提供基本的應用程式結構
       appBar: AppBar( // 應用程式頂部欄
-        title: const Text('種下您今天的搖錢樹 Make every second counts'), // 標題
+        title: const Text('種下您今天的搖錢樹\nMake every second counts'), // 標題
         centerTitle: true, // 標題居中
       ),
       body: Padding( // 為 body 內容添加內邊距
