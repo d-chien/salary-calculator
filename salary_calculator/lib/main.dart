@@ -90,6 +90,29 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
   String _statusMessage = '選擇模式，輸入資訊，然後點擊開始'; // 顯示給用戶的狀態訊息
   Timer? _timer; // 定時器物件
 
+  // 新增：鼓勵訊息列表 (使用 const 確保列表內容是編譯時常量，提高效能)
+  final List<String> _encouragingMessages = const [
+    '努力工作，薪水正在累積！',
+    '加油！距離下班又近一步了！',
+    '你的每一秒都很值錢！',
+    '專注工作，收入隨之而來！',
+    '時間就是金錢，你正看著它增長！',
+    '保持效率，今天也能賺飽飽！',
+    '讓薪水跳起來！',
+    '每一分鐘的付出都有回報！',
+    '你正在為自己創造價值！',
+    '金錢不是萬能，但賺錢的感覺很棒！',
+    '為了更好的生活，繼續努力！',
+    '這場與時間的競賽，你正領先！',
+    '看看你的搖錢樹長多高了！', // 加入你提到的搖錢樹元素
+    '今天的目標金額，你正在逐步靠近！',
+    '打工人，打工魂，打工都是人上人！', 
+    '別忘了休息一下，再賺更多！',
+  ];
+  // 新增：隨機數生成器實例
+  final Random _random = Random(); // 需要 import 'dart:math';
+
+
   // --- 單人模式狀態變數 ---
   final TextEditingController _singleNicknameController = TextEditingController();
   final TextEditingController _singleMonthlySalaryController = TextEditingController();
@@ -99,6 +122,8 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
   DateTime? _singleWorkStartTimeToday; // 結合今天日期和單人模式選定的開始時間 (計算用)
   DateTime? _singleWorkEndTimeToday;   // 結合今天日期和單人模式選定的結束時間 (計算用)
   Duration? _singleTotalWorkDuration; // 單人模式總工作時長 (計算用)
+  // 新增：記錄上一次更換鼓勵訊息的時間點 (初始為 null)
+  DateTime? _lastMessageChangeTime;
 
   double _singleCurrentEarnings = 0.0; // 單人模式當前已賺金額 (顯示用)
   double _singleWorkProgress = 0.0; // 單人模式進度條進度 (顯示用)
@@ -252,6 +277,8 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
       _singleWorkProgress = 0.0;
       _isSingleWorking = false; // 初始狀態，實際在 update 中判斷
       _isSingleWorkdayFinished = false; // 初始狀態
+      _lastMessageChangeTime = null; // <-- 新增：初始化上一次訊息變更時間為 null
+
 
       // 初始化狀態訊息
       setState(() { _statusMessage = '準備計算...'; });
@@ -376,14 +403,39 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
         _isSingleWorking = isDuringWork; // 當前時間是否在設定的工作時段內
         _isSingleWorkdayFinished = isAfterWork; // 當前時間是否已過了設定的工作結束時間
 
+        
+
         // 更新狀態訊息
         if (isBeforeWork) {
            _statusMessage = '工作尚未開始 (${DateFormat.Hm().format(_singleWorkStartTimeToday!)} 開始)...';
         } else if (isDuringWork) {
-           _statusMessage = '工作進行中...';
+           // 新增：檢查是否已滿 5 分鐘，需要更換鼓勵訊息
+             bool shouldChangeMessage = false;
+             final currentTime = DateTime.now(); // 確保這裡使用當前時間進行比較
+
+             // 如果是第一次進入 isDuringWork 狀態，或者距離上次更新已滿 5 分鐘
+             if (_lastMessageChangeTime == null) {
+                shouldChangeMessage = true; // 第一次進入，立即更換訊息
+             } else {
+                final timeSinceLastChange = currentTime.difference(_lastMessageChangeTime!); // 計算時間差
+                // 如果時間差大於或等於 3 分鐘
+                if (timeSinceLastChange >= const Duration(minutes: 3)) { // <-- 設定 3 分鐘的間隔
+                   shouldChangeMessage = true;
+                }
+             }
+
+             // 如果應該更換訊息
+             if (shouldChangeMessage) {
+                // 隨機選取一條新的鼓勵訊息
+                final randomIndex = _random.nextInt(_encouragingMessages.length);
+                _statusMessage = _encouragingMessages[randomIndex]; // 更新狀態訊息
+                _lastMessageChangeTime = currentTime; // <-- 記錄本次更新訊息的時間
+             }
+             // 如果不應該更換訊息 (未滿 3 分鐘)，則保持 _statusMessage 不變
         } else { // isAfterWork
            _statusMessage = '恭喜！今天的搖錢樹已長大！\n今天共賺了${earnings.toStringAsFixed(2)}元'; // 工作日結束訊息
         }
+        
 
         // 如果工作日已經結束，取消定時器
         if (_isSingleWorkdayFinished) {
@@ -687,20 +739,23 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch, // 子 Widget 水平拉伸填滿
                     children: <Widget>[
                        // --- 模式切換開關 ---
-                       SwitchListTile( // 列表項形式的開關
-                          title: const Text('會議(老闆)模式：可計算同場會議整體消耗了多少的薪水'), // 標題
-                          value: _meetingMode, // 開關的當前值
-                          onChanged: (bool value) {
-                             // 當開關狀態改變時，重置所有狀態並切換模式
-                             _reset(); // 先重置當前模式的狀態
-                             setState(() {
-                               _meetingMode = value; // 切換模式狀態
-                               // 根據新模式設定初始狀態訊息
-                               _statusMessage = _meetingMode ? '輸入與會人員資訊，然後點擊開始會議' : '輸入暱稱、月薪並選擇工作時間，然後點擊開始';
-                             });
-                          },
-                       ),
-                       const Divider(), // 在模式開關下方添加分隔線
+                       if ((!_meetingMode && !_isSingleWorking && !_isSingleWorkdayFinished && _singleWorkStartTimeToday == null) ||
+                          (_meetingMode && !_isMeetingActive && !_isMeetingEnded)) ...[
+                        SwitchListTile( // 列表項形式的開關
+                            title: const Text('會議(老闆)模式：可計算同場會議整體消耗了多少的薪水'), // 標題
+                            value: _meetingMode, // 開關的當前值
+                            onChanged: (bool value) {
+                              // 當開關狀態改變時，重置所有狀態並切換模式
+                              _reset(); // 先重置當前模式的狀態
+                              setState(() {
+                                _meetingMode = value; // 切換模式狀態
+                                // 根據新模式設定初始狀態訊息
+                                _statusMessage = _meetingMode ? '輸入與會人員資訊，然後點擊開始會議' : '輸入暱稱、月薪並選擇工作時間，然後點擊開始';
+                              });
+                            },
+                        ),
+                        const Divider(), // 在模式開關下方添加分隔線
+                        ],
 
                       // --- 輸入界面 (根據模式和狀態條件顯示) ---
                       // 只有在不是正在計算/會議中/結束狀態時顯示輸入界面
