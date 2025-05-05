@@ -3,6 +3,7 @@ import 'dart:async'; // 用於 Timer 定時器
 import 'dart:math'; // 用於 min 函數
 import 'package:intl/intl.dart'; // 用於時間格式化
 import 'package:community_charts_flutter/community_charts_flutter.dart' as charts; // 用於繪製圖表
+import 'articles_page.dart';
 
 // --- 資料類別 ---
 
@@ -905,6 +906,29 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
                            textAlign: TextAlign.center, // 文本居中
                            style: TextStyle(color: Colors.grey[600], fontSize: 14),
                          ),
+                         
+                         const SizedBox(height: 24), // <-- 新增：在狀態訊息和文章按鈕之間添加間距
+
+                          // 新增：導航到文章專區的按鈕
+                          ElevatedButton(
+                            onPressed: () {
+                              // 使用 Navigator.push 方法導航到新的 ArticlesPage
+                              Navigator.push(
+                                context,
+                                // MaterialPageRoute 是一個簡單的路由，用於創建全螢幕的頁面轉場
+                                MaterialPageRoute(builder: (context) => const ArticlesPage()), // 導航到 ArticlesPage
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12.0),
+                              textStyle: const TextStyle(fontSize: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              backgroundColor: Colors.teal, // 使用一個不同的顏色來區分按鈕 (可選)
+                            ),
+                            child: const Text('閱讀更多文章'), // 按鈕上顯示的文字
+                          ),
                       ],
 
                       // --- 計算顯示界面 (根據模式和狀態條件顯示) ---
