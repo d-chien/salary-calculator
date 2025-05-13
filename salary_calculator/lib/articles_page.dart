@@ -47,6 +47,18 @@ class ArticlesPage extends StatelessWidget {
             ),
             Divider(height: 32, thickness: 1), // 分隔線
 
+            // 文章二
+            Text(
+              '有效善用工作時間的技巧', // 文章標題
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8), // 標題與內容之間的間距
+            Text(
+              '是不是覺得，每天工作似乎都一成不變，永遠有忙的事情要做，永遠都做不完？給你一個小技巧，當你工作漫無目的的時候，停下來思考一下，我現在在做的事情真的值得我花這樣的時間做嗎？還是我其實可以有更有效率的方式進行？',
+              style: TextStyle(fontSize: 16),
+            ),
+            Divider(height: 32, thickness: 1), // 分隔線
+
             // 你可以在這裡添加更多文章...
              Text(
               '夢想儲蓄計劃：將目標變為現實', // 文章標題
