@@ -898,7 +898,7 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
                              ),
                            ),
                            // 按鈕文本根據模式顯示
-                           child: Text(_meetingMode ? '開始會議計算' : '開始計算'),
+                           child: Text(_meetingMode ? '請開始會議計算' : '開始計算'),
                          ),
                          const SizedBox(height: 12), // 按鈕下方的間距
                          Text( // 顯示當前狀態或錯誤訊息
@@ -906,7 +906,7 @@ class _SalaryCalculatorPageState extends State<SalaryCalculatorPage> {
                            textAlign: TextAlign.center, // 文本居中
                            style: TextStyle(color: Colors.grey[600], fontSize: 14),
                          ),
-                         
+
                          const SizedBox(height: 24), // <-- 新增：在狀態訊息和文章按鈕之間添加間距
 
                           // 新增：導航到文章專區的按鈕
