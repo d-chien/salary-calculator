@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'dart:async'; // 需要用到 Timer (雖然這些函數沒有直接用，但放在一起管理工具類相關的可能需要)
-import 'package:intl/intl.dart'; // 需要用到 DateFormat (雖然這些函數沒有直接用，但在 main 或其他頁面會用到)
+
 
 // 根據月薪計算每秒費率 (假設每月工作 22 天，每天工作 8 小時)
 double calculateSecondRate(double monthlySalary) { // 移除開頭的底線，使其成為公開函數
