@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'single_mode_page.dart';
 import 'meeting_mode_page.dart';
 import 'articles_page.dart';
+import 'lunch_suggest_page.dart';
 
 
 class HomePage extends StatelessWidget {
@@ -109,6 +110,27 @@ class HomePage extends StatelessWidget {
                    ),
                   child: const Text('文章專區'), // 按鈕文字
                 ),
+                const SizedBox(height: 16), // 間距
+                
+                // <-- 新增：午餐建議按鈕 -->
+                 ElevatedButton(
+                   onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LunchSuggestPage()), // 導航到午餐建議頁面
+                    );
+                  },
+                   style: ElevatedButton.styleFrom( // 按鈕樣式 (不同顏色)
+                     padding: const EdgeInsets.symmetric(vertical: 15.0),
+                     textStyle: const TextStyle(fontSize: 18),
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(8.0),
+                     ),
+                      backgroundColor: Colors.orange, // 橘色按鈕
+                   ),
+                  child: const Text('午餐吃什麼？'), // 按鈕文字
+                ),
+                // <-- 新增按鈕結束 -->
               ],
            ),
         ),

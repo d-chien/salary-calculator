@@ -6,6 +6,7 @@ import 'dart:math'; // 用於 min/max
 import 'package:intl/intl.dart'; // 用於時間格式化
 
 import 'utils.dart'; // <-- 導入工具函數
+import 'lunch_suggest_page.dart';
 
 
 class SingleModePage extends StatefulWidget {
@@ -537,7 +538,28 @@ class _SingleModePageState extends State<SingleModePage> {
                          color: Colors.green,
                        ),
                      ),
-                     const SizedBox(height: 24), // 間距
+                     const SizedBox(height: 24),
+                     
+                     // --- 新增按鈕：導航到午餐選項頁面 ---
+                     ElevatedButton(
+                       onPressed: () {
+                         // 使用 Navigator.push 導航到午餐建議頁面
+                         Navigator.push(
+                           context,
+                           MaterialPageRoute(builder: (context) => const LunchSuggestPage()), // 創建並導航到 LunchSuggestPage
+                         );
+                       },
+                       style: ElevatedButton.styleFrom(
+                         padding: const EdgeInsets.symmetric(vertical: 15.0),
+                         textStyle: const TextStyle(fontSize: 18),
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(8.0),
+                         ),
+                         backgroundColor: Colors.orange, // 使用午餐頁面相似的顏色 (可選)
+                       ),
+                       child: const Text('午餐吃什麼？'), // 按鈕文字
+                     ),
+                      const SizedBox(height: 16), // 間距
 
                      // --- 回到設定頁按鈕 ---
                      ElevatedButton(
