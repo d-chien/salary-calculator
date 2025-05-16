@@ -25,8 +25,12 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.blueGrey[60],
         primarySwatch: Colors.blue, // 使用 Material Design 的藍色主題
+        // colorScheme: ColorScheme.fromSeed(
+        //   seedColor: Colors.blue, // 你的主色調依然是藍色
+        //   brightness: Brightness.dark, // 這是亮色主題
+        // ),
         visualDensity: VisualDensity.adaptivePlatformDensity, // 視覺密度，適應不同平台
-        //useMaterial3: true
+        useMaterial3: false
       ),
       // 移除右上角的 debug 標誌 (發布時通常會移除)
       debugShowCheckedModeBanner: false,
