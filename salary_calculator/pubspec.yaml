@@ -1,5 +1,5 @@
 name: salary_calculator
-description: A new Flutter project.
+description: 需要工作動力嗎？用這個網頁看你薪水跳動。不知道午餐要吃什麼嗎？用這個網站不再煩惱午餐挑選。
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

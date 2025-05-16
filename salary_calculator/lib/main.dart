@@ -23,8 +23,10 @@ class MyApp extends StatelessWidget {
       title: '薪水計算器', // 保持一個簡潔的系統標題
       // 應用程式的主題設定
       theme: ThemeData(
+        scaffoldBackgroundColor: Colors.blueGrey[60],
         primarySwatch: Colors.blue, // 使用 Material Design 的藍色主題
         visualDensity: VisualDensity.adaptivePlatformDensity, // 視覺密度，適應不同平台
+        //useMaterial3: true
       ),
       // 移除右上角的 debug 標誌 (發布時通常會移除)
       debugShowCheckedModeBanner: false,
@@ -34,6 +36,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-// 請確保在這個檔案中，除了上面的 import、main() 函數和 MyApp class 之外，沒有其他原來 SalaryCalculatorPage 的程式碼殘留。
-// 原來的 SalaryCalculatorPage 相關的狀態變數、方法、helper 函數都應該已經移動到 single_mode_page.dart 和 meeting_mode_page.dart 中了。
