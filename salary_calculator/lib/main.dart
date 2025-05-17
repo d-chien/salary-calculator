@@ -118,7 +118,7 @@ class _AdWidgetState extends State<AdWidget> {
       callMethod(oneadTextPubs, 'push', [jsOneadText]);
 
       print('OneAD: Pushed config for ${widget.domId}.');
-    }); // Future.delayed 結束
+    }); 
   }
 
 
