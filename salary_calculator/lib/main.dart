@@ -73,58 +73,54 @@ class _AdWidgetState extends State<AdWidget> {
 
   // 載入並初始化 OneAD 廣告
   void _loadOneAd() {
-    // 透過 DOM ID 找到由 HtmlElementView 創建的 DivElement
-    final html.DivElement? adDiv = html.document.getElementById(widget.domId) as html.DivElement?;
+    // 引入一個短暫的延遲，確保 HTML 元素完全渲染到 DOM 中
+    Future.delayed(const Duration(milliseconds: 50), () { // 嘗試 50 毫秒的延遲
+      final html.DivElement? adDiv = html.document.getElementById(widget.domId) as html.DivElement?;
 
-    if (adDiv == null) {
-      print('OneAD: Div element with ID ${widget.domId} not found.');
-      return;
-    }
-
-    print('OneAD: Found div element: ${widget.domId}');
-
-    // 定義 OneAD 的回調函數，用於監聽廣告載入狀態
-    // 使用 allowInterop (來自 dart:js_util) 確保 Dart 函數可以被 JavaScript 調用
-    final customCall = allowInterop((params) {
-      if (params.hasAd) {
-        print('OneAD Slot (${widget.domId}) has AD.');
-      } else {
-        print('OneAD Slot (${widget.domId}) AD Empty.');
+      if (adDiv == null) {
+        print('OneAD: Div element with ID ${widget.domId} still not found after delay. This might indicate a problem with the ID or rendering.');
+        // 如果延遲後仍然找不到，可能需要進一步檢查 ID 或渲染邏輯
+        return;
       }
-    });
 
-    // 構建 ONEAD_TEXT.pub 的 Dart Map
-    final Map<String, dynamic> oneadTextPub = {
-      'uid': widget.uid,
-      'slotobj': adDiv, // 將實際的 DivElement 傳遞給 OneAD
-      'player_mode': widget.playerMode,
-      'queryAdCallback': customCall,
-    };
+      print('OneAD: Found div element: ${widget.domId}');
 
-    // 根據播放模式添加額外參數
-    if (widget.playerMode == "native-drive") {
-      oneadTextPub['player_mode_div'] = "div-onead-ad"; // 來自 OneAD 範例的固定 ID
-      oneadTextPub['max_threads'] = 3;
-      oneadTextPub['position_id'] = widget.positionId ?? "0"; // 如果未提供，預設為 "0" (桌面版)
-    }
+      final customCall = allowInterop((params) {
+        if (params.hasAd) {
+          print('OneAD Slot (${widget.domId}) has AD.');
+        } else {
+          print('OneAD Slot (${widget.domId}) AD Empty.');
+        }
+      });
 
-    // 使用 jsify (來自 dart:js_util) 將 Dart Map 轉換為 JavaScript 物件
-    final jsOneadText = jsify({'pub': oneadTextPub});
+      final Map<String, dynamic> oneadTextPub = {
+        'uid': widget.uid,
+        'slotobj': adDiv,
+        'player_mode': widget.playerMode,
+        'queryAdCallback': customCall,
+      };
 
-    // 透過 getProperty (來自 dart:js_util) 訪問 window.ONEAD_text_pubs
-    dynamic oneadTextPubs = getProperty(html.window, 'ONEAD_text_pubs');
+      if (widget.playerMode == "native-drive") {
+        oneadTextPub['player_mode_div'] = "div-onead-ad";
+        oneadTextPub['max_threads'] = 3;
+        oneadTextPub['position_id'] = widget.positionId ?? "0";
+      }
 
-    // 如果 ONEAD_text_pubs 不存在，則使用 jsify([]) 創建一個新的 JavaScript 陣列
-    if (oneadTextPubs == null) {
-      oneadTextPubs = jsify([]); // 創建一個空的 JS 陣列
-      setProperty(html.window, 'ONEAD_text_pubs', oneadTextPubs); // 使用 setProperty 設置到 window 物件上
-    }
+      final jsOneadText = jsify({'pub': oneadTextPub});
 
-    // 使用 callMethod (來自 dart:js_util) 調用 JavaScript 陣列的 push 方法
-    callMethod(oneadTextPubs, 'push', [jsOneadText]);
+      dynamic oneadTextPubs = getProperty(html.window, 'ONEAD_text_pubs');
 
-    print('OneAD: Pushed config for ${widget.domId}.');
+      if (oneadTextPubs == null) {
+        oneadTextPubs = jsify([]);
+        setProperty(html.window, 'ONEAD_text_pubs', oneadTextPubs);
+      }
+
+      callMethod(oneadTextPubs, 'push', [jsOneadText]);
+
+      print('OneAD: Pushed config for ${widget.domId}.');
+    }); // Future.delayed 結束
   }
+
 
   @override
   Widget build(BuildContext context) {
