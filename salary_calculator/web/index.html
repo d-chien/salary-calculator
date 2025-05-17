@@ -1,32 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
 
-  <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="salary_calculator">
   <link rel="apple-touch-icon" href="icons/favicon.png">
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="icons/favicon.png"/>
 
   <title>salary_calculator</title>
@@ -36,55 +21,15 @@
     // The value below is injected by flutter build, do not touch.
     var serviceWorkerVersion = null;
   </script>
-  <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
-  <!-- This is AdSense-->
+
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8240234073566136"
   crossorigin="anonymous"></script>
-</head>
+
+  <script src="https://ad-specs.guoshipartners.com/static/js/ad-serv.min.js" defer></script>
+
+  </head>
 <body>
-  <div id="div-onead-nd-01" style="width: 100%; height: auto;position: relative; z-index: 9999;"></div>
-  
-  <div id="div-onead-draft" style="width: 100%; height: auto;position: relative; z-index: 9999;"></div>
-  <script type="text/javascript">
-    var custom_call = function (params) {
-        if (params.hasAd) {
-          console.log('TD has AD')
-        } else {
-          console.log('TD AD Empty')
-        }
-      }
-    ONEAD_TEXT = {};
-    ONEAD_TEXT.pub = {};
-    ONEAD_TEXT.pub.uid = "2000493";
-    ONEAD_TEXT.pub.slotobj = document.getElementById("div-onead-draft");
-    ONEAD_TEXT.pub.player_mode = "text-drive";
-    ONEAD_TEXT.pub.queryAdCallback = custom_call;
-    window.ONEAD_text_pubs = window.ONEAD_text_pubs || [];
-    ONEAD_text_pubs.push(ONEAD_TEXT);
-  </script>
-  <script src="https://ad-specs.guoshipartners.com/static/js/ad-serv.min.js"></script>
-  <script type="text/javascript">
-    var custom_call = function (params) {
-        if (params.hasAd) {
-          console.log('ND has AD')
-        } else {
-          console.log('ND AD Empty');
-        }
-      }
-    ONEAD_TEXT = {};
-    ONEAD_TEXT.pub = {};
-    ONEAD_TEXT.pub.uid = "2000493";
-    ONEAD_TEXT.pub.slotobj = document.getElementById("div-onead-nd-01");
-    ONEAD_TEXT.pub.player_mode = "native-drive";
-    ONEAD_TEXT.pub.player_mode_div = "div-onead-ad";
-    ONEAD_TEXT.pub.max_threads = 3;
-    ONEAD_TEXT.pub.position_id = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)? "5" : "0";
-    ONEAD_TEXT.pub.queryAdCallback = custom_call;
-    window.ONEAD_text_pubs = window.ONEAD_text_pubs || [];
-    ONEAD_text_pubs.push(ONEAD_TEXT);
-  </script>
-  <script src="https://ad-specs.guoshipartners.com/static/js/ad-serv.min.js"></script>
   <script>
     window.addEventListener('load', function(ev) {
       // Download main.dart.js
@@ -100,7 +45,5 @@
       });
     });
   </script>
-  
-  
 </body>
 </html>
